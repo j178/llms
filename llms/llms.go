@@ -19,15 +19,6 @@ type Model interface {
 	// messages. It's the most general interface for multi-modal LLMs that support
 	// chat-like interactions.
 	GenerateContent(ctx context.Context, messages []MessageContent, options ...CallOption) (*ContentResponse, error)
-
-	// Call is a simplified interface for a text-only Model, generating a single
-	// string response from a single string prompt.
-	//
-	// Deprecated: this method is retained for backwards compatibility. Use the
-	// more general [GenerateContent] instead. You can also use
-	// the [GenerateFromSinglePrompt] function which provides a similar capability
-	// to Call and is built on top of the new interface.
-	Call(ctx context.Context, prompt string, options ...CallOption) (string, error)
 }
 
 // GenerateFromSinglePrompt is a convenience function for calling an LLM with

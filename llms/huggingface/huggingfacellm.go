@@ -23,11 +23,6 @@ type LLM struct {
 
 var _ llms.Model = (*LLM)(nil)
 
-// Call implements the LLM interface.
-func (o *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
-	return llms.GenerateFromSinglePrompt(ctx, o, prompt, options...)
-}
-
 // GenerateContent implements the Model interface.
 func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) { //nolint: lll, cyclop, whitespace
 

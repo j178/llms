@@ -38,11 +38,6 @@ func New(opts ...Option) (*LLM, error) {
 	}, err
 }
 
-// Call requests a completion for the given prompt.
-func (o *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
-	return llms.GenerateFromSinglePrompt(ctx, o, prompt, options...)
-}
-
 // GenerateContent implements the Model interface.
 //
 //nolint:goerr113

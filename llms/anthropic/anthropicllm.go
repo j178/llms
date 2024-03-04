@@ -48,11 +48,6 @@ func newClient(opts ...Option) (*anthropicclient.Client, error) {
 	return anthropicclient.New(options.token, options.model)
 }
 
-// Call requests a completion for the given prompt.
-func (o *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
-	return llms.GenerateFromSinglePrompt(ctx, o, prompt, options...)
-}
-
 // GenerateContent implements the Model interface.
 func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) { //nolint: lll, cyclop, whitespace
 

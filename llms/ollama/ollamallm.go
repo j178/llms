@@ -39,11 +39,6 @@ func New(opts ...Option) (*LLM, error) {
 	return &LLM{client: client, options: o}, nil
 }
 
-// Call Implement the call interface for LLM.
-func (o *LLM) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
-	return llms.GenerateFromSinglePrompt(ctx, o, prompt, options...)
-}
-
 // GenerateContent implements the Model interface.
 // nolint: goerr113
 func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) { // nolint: lll, cyclop, funlen

@@ -28,11 +28,6 @@ const (
 	RoleUser  = "user"
 )
 
-// Call implements the [llms.Model] interface.
-func (g *GoogleAI) Call(ctx context.Context, prompt string, options ...llms.CallOption) (string, error) {
-	return llms.GenerateFromSinglePrompt(ctx, g, prompt, options...)
-}
-
 // GenerateContent implements the [llms.Model] interface.
 func (g *GoogleAI) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) {
 	if g.CallbacksHandler != nil {
