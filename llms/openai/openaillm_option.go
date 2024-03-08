@@ -35,6 +35,7 @@ type options struct {
 
 	// required when APIType is APITypeAzure or APITypeAzureAD
 	apiVersion     string
+	deploymentName string
 	embeddingModel string
 
 	callbackHandler callbacks.Handler
@@ -55,6 +56,13 @@ func WithToken(token string) Option {
 func WithModel(model string) Option {
 	return func(opts *options) {
 		opts.model = model
+	}
+}
+
+// WithDeploymentName passes the OpenAI deployment name to the client. Required when ApiType is Azure.
+func WithDeploymentName(deploymentName string) Option {
+	return func(opts *options) {
+		opts.deploymentName = deploymentName
 	}
 }
 

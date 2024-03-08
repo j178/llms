@@ -35,6 +35,7 @@ type Client struct {
 
 	// required when APIType is APITypeAzure or APITypeAzureAD
 	apiVersion      string
+	deploymentName  string
 	embeddingsModel string
 }
 
@@ -47,8 +48,9 @@ type Doer interface {
 }
 
 // New returns a new OpenAI client.
-func New(token string, model string, baseURL string, organization string,
-	apiType APIType, apiVersion string, httpClient Doer, embeddingsModel string,
+func New(
+	token string, model string, baseURL string, organization string,
+	apiType APIType, deploymentName string, apiVersion string, httpClient Doer, embeddingsModel string,
 	opts ...Option,
 ) (*Client, error) {
 	c := &Client{
@@ -58,6 +60,7 @@ func New(token string, model string, baseURL string, organization string,
 		baseURL:         strings.TrimSuffix(baseURL, "/"),
 		organization:    organization,
 		apiType:         apiType,
+		deploymentName:  deploymentName,
 		apiVersion:      apiVersion,
 		httpClient:      httpClient,
 	}
@@ -102,10 +105,12 @@ func (c *Client) CreateEmbedding(ctx context.Context, r *EmbeddingRequest) ([][]
 		r.Model = defaultEmbeddingModel
 	}
 
-	resp, err := c.createEmbedding(ctx, &embeddingPayload{
-		Model: r.Model,
-		Input: r.Input,
-	})
+	resp, err := c.createEmbedding(
+		ctx, &embeddingPayload{
+			Model: r.Model,
+			Input: r.Input,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -160,22 +165,23 @@ func (c *Client) setHeaders(req *http.Request) {
 	}
 }
 
-func (c *Client) buildURL(suffix string, model string) string {
+func (c *Client) buildURL(suffix string, deployment string) string {
 	if IsAzure(c.apiType) {
-		return c.buildAzureURL(suffix, model)
+		return c.buildAzureURL(suffix, deployment)
 	}
 
 	// open ai implement:
 	return fmt.Sprintf("%s%s", c.baseURL, suffix)
 }
 
-func (c *Client) buildAzureURL(suffix string, model string) string {
+func (c *Client) buildAzureURL(suffix string, deployment string) string {
 	baseURL := c.baseURL
 	baseURL = strings.TrimRight(baseURL, "/")
 
 	// azure example url:
-	// /openai/deployments/{model}/chat/completions?api-version={api_version}
-	return fmt.Sprintf("%s/openai/deployments/%s%s?api-version=%s",
-		baseURL, model, suffix, c.apiVersion,
+	// /openai/deployments/{deployment}/chat/completions?api-version={api_version}
+	return fmt.Sprintf(
+		"%s/openai/deployments/%s%s?api-version=%s",
+		baseURL, deployment, suffix, c.apiVersion,
 	)
 }

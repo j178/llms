@@ -11,7 +11,7 @@ import (
 var (
 	ErrEmptyResponse              = errors.New("no response")
 	ErrMissingToken               = errors.New("missing the OpenAI API key, set it in the OPENAI_API_KEY environment variable") //nolint:lll
-	ErrMissingAzureEmbeddingModel = errors.New("embeddings model needs to be provided when using Azure API")
+	ErrMissingAzureDeploymentName = errors.New("deployment name needs to be provided when using Azure API")
 
 	ErrUnexpectedResponseLength = errors.New("unexpected length of response")
 )
@@ -32,10 +32,12 @@ func newClient(opts ...Option) (*options, *openaiclient.Client, error) {
 	}
 
 	// set of options needed for Azure client
-	if openaiclient.IsAzure(openaiclient.APIType(options.apiType)) && options.apiVersion == "" {
-		options.apiVersion = DefaultAPIVersion
-		if options.embeddingModel == "" {
-			return options, nil, ErrMissingAzureEmbeddingModel
+	if openaiclient.IsAzure(openaiclient.APIType(options.apiType)) {
+		if options.apiVersion == "" {
+			options.apiVersion = DefaultAPIVersion
+		}
+		if options.deploymentName == "" {
+			return options, nil, ErrMissingAzureDeploymentName
 		}
 	}
 
@@ -43,8 +45,17 @@ func newClient(opts ...Option) (*options, *openaiclient.Client, error) {
 		return options, nil, ErrMissingToken
 	}
 
-	cli, err := openaiclient.New(options.token, options.model, options.baseURL, options.organization,
-		openaiclient.APIType(options.apiType), options.apiVersion, options.httpClient, options.embeddingModel)
+	cli, err := openaiclient.New(
+		options.token,
+		options.model,
+		options.baseURL,
+		options.organization,
+		openaiclient.APIType(options.apiType),
+		options.deploymentName,
+		options.apiVersion,
+		options.httpClient,
+		options.embeddingModel,
+	)
 	return options, cli, err
 }
 
