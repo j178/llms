@@ -41,7 +41,7 @@ func New(opts ...Option) (*LLM, error) {
 // GenerateContent implements the Model interface.
 //
 //nolint:goerr113
-func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) { //nolint: lll, cyclop
+func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageContent, options ...llms.CallOption) (*llms.ContentResponse, error) { // nolint: lll, cyclop
 	if o.CallbacksHandler != nil {
 		o.CallbacksHandler.HandleLLMGenerateContentStart(ctx, messages)
 	}
@@ -53,7 +53,16 @@ func (o *LLM) GenerateContent(ctx context.Context, messages []llms.MessageConten
 
 	chatMsgs := make([]*ChatMessage, 0, len(messages))
 	for _, mc := range messages {
-		msg := &ChatMessage{MultiContent: mc.Parts}
+		var msg *ChatMessage
+		if len(mc.Parts) == 1 {
+			content, ok := mc.Parts[0].(llms.TextContent)
+			if ok {
+				msg = &ChatMessage{Content: content.Text}
+			}
+		}
+		if msg == nil {
+			msg = &ChatMessage{MultiContent: mc.Parts}
+		}
 		switch mc.Role {
 		case schema.ChatMessageTypeSystem:
 			msg.Role = RoleSystem
